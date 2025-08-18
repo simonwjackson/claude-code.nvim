@@ -754,4 +754,58 @@ describe('terminal module', function()
       assert.are.equal(math.floor(editor_height * 1.1), nvim_open_win_config.height)
     end)
   end)
+
+  describe('filetype setting', function()
+    it('should set filetype to claudecode for new terminal buffers', function()
+      -- No instances exist
+      claude_code.claude_code.instances = {}
+      claude_code.claude_code.current_instance = nil
+
+      -- Track calls to nvim_set_option_value
+      local filetype_set = false
+      local original_set_option = _G.vim.api.nvim_set_option_value
+      _G.vim.api.nvim_set_option_value = function(option, value, opts)
+        if option == 'filetype' and value == 'claudecode' then
+          filetype_set = true
+        end
+        return original_set_option(option, value, opts)
+      end
+
+      -- Call toggle
+      terminal.toggle(claude_code, config, git)
+
+      -- Check that filetype was set
+      assert.is_true(filetype_set, 'Filetype should be set to claudecode')
+
+      -- Restore original function
+      _G.vim.api.nvim_set_option_value = original_set_option
+    end)
+
+    it('should ensure filetype is set when reopening existing buffers', function()
+      -- Setup existing instance
+      local instance_id = '/test/git/root'
+      claude_code.claude_code.instances[instance_id] = 42
+      claude_code.claude_code.current_instance = instance_id
+      win_ids = {} -- No windows displaying the buffer
+
+      -- Track calls to ensure_claude_filetype
+      local filetype_ensured = false
+      local original_set_option = _G.vim.api.nvim_set_option_value
+      _G.vim.api.nvim_set_option_value = function(option, value, opts)
+        if option == 'filetype' and value == 'claudecode' and opts and opts.buf == 42 then
+          filetype_ensured = true
+        end
+        return original_set_option(option, value, opts)
+      end
+
+      -- Call toggle
+      terminal.toggle(claude_code, config, git)
+
+      -- Check that filetype was ensured for existing buffer
+      assert.is_true(filetype_ensured, 'Filetype should be ensured for existing buffer')
+
+      -- Restore original function
+      _G.vim.api.nvim_set_option_value = original_set_option
+    end)
+  end)
 end)

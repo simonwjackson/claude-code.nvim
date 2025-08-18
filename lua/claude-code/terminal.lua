@@ -163,6 +163,13 @@ local function configure_window_options(win_id, config)
   end
 end
 
+--- Ensure Claude Code filetype is set on buffer
+--- @param bufnr number Buffer number
+--- @private
+local function ensure_claude_filetype(bufnr)
+  vim.api.nvim_set_option_value('filetype', 'claudecode', {buf = bufnr})
+end
+
 --- Generate buffer name for instance
 --- @param instance_id string Instance identifier
 --- @param config table Plugin configuration
@@ -299,6 +306,9 @@ local function handle_existing_instance(bufnr, config)
     end
   else
     -- Claude Code buffer exists but is not visible, open it in a split or float
+    -- Ensure filetype is set (in case it was changed)
+    ensure_claude_filetype(bufnr)
+    
     if config.window.position == 'float' then
       create_float(config, bufnr)
     else
@@ -337,6 +347,9 @@ local function create_new_instance(claude_code, config, git, instance_id)
     -- Run terminal in the buffer
     vim.fn.termopen(cmd)
 
+    -- Set filetype for Claude Code terminal buffers
+    vim.api.nvim_set_option_value('filetype', 'claudecode', {buf = new_bufnr})
+
     -- Create a unique buffer name
     local buffer_name = generate_buffer_name(instance_id, config)
     vim.api.nvim_buf_set_name(new_bufnr, buffer_name)
@@ -361,6 +374,9 @@ local function create_new_instance(claude_code, config, git, instance_id)
 
     vim.cmd(cmd)
     vim.cmd 'setlocal bufhidden=hide'
+
+    -- Set filetype for Claude Code terminal buffers
+    vim.cmd 'setlocal filetype=claudecode'
 
     -- Create a unique buffer name
     local buffer_name = generate_buffer_name(instance_id, config)

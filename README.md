@@ -231,6 +231,40 @@ require("claude-code").setup({
 })
 ```
 
+## Customization
+
+### Filetype Integration
+
+All Claude Code terminal buffers are assigned the filetype `claudecode`. This allows for custom configuration and integration with other plugins:
+
+```lua
+-- Custom syntax highlighting or options for Claude Code buffers
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "claudecode",
+  callback = function()
+    -- Custom settings for Claude Code buffers
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    -- Add custom keymaps specific to Claude Code
+    vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = true, desc = 'Close Claude Code' })
+  end,
+})
+```
+
+**Integration with window managers**: The `claudecode` filetype can be used with plugins like [edgy.nvim](https://github.com/folke/edgy.nvim) for advanced window management:
+
+```lua
+require('edgy').setup({
+  right = {
+    {
+      title = 'Claude Code',
+      ft = 'claudecode',  -- Match Claude Code buffers by filetype
+      pinned = true,
+    },
+  },
+})
+```
+
 ## How it Works
 
 This plugin:

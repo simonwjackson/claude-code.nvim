@@ -7,10 +7,11 @@ CONTENTS                                                   *claude-code-contents
   2. Installation .......................... |claude-code-installation|
   3. Usage ................................ |claude-code-usage|
   4. Configuration ........................ |claude-code-configuration|
-  5. Commands ............................. |claude-code-commands|
-  6. Mappings ............................. |claude-code-mappings|
-  7. Contributing ......................... |claude-code-contributing|
-  8. License .............................. |claude-code-license|
+  5. Customization ........................ |claude-code-customization|
+  6. Commands ............................. |claude-code-commands|
+  7. Mappings ............................. |claude-code-mappings|
+  8. Contributing ......................... |claude-code-contributing|
+  9. License .............................. |claude-code-license|
 
 ==============================================================================
 1. INTRODUCTION                                        *claude-code-introduction*
@@ -144,7 +145,42 @@ default configuration:
 <
 
 ==============================================================================
-5. COMMANDS                                                *claude-code-commands*
+5. CUSTOMIZATION                                     *claude-code-customization*
+
+FILETYPE INTEGRATION                                     *claude-code-filetype*
+
+All Claude Code terminal buffers are assigned the filetype "claudecode". This
+allows for custom configuration and integration with other plugins:
+
+>lua
+  -- Custom settings for Claude Code buffers
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "claudecode",
+    callback = function()
+      vim.opt_local.wrap = true
+      vim.opt_local.linebreak = true
+      -- Add custom keymaps
+      vim.keymap.set('n', 'q', '<cmd>close<cr>', { buffer = true })
+    end,
+  })
+<
+
+The filetype can be used with window management plugins like edgy.nvim:
+
+>lua
+  require('edgy').setup({
+    right = {
+      {
+        title = 'Claude Code',
+        ft = 'claudecode',  -- Match by filetype
+        pinned = true,
+      },
+    },
+  })
+<
+
+==============================================================================
+6. COMMANDS                                                *claude-code-commands*
 
 :ClaudeCode                                                       *:ClaudeCode*
     Toggle the Claude Code terminal window.
@@ -163,7 +199,7 @@ Output Options Commands:
 Note: Commands are automatically generated for each entry in your command_variants configuration.
 
 ==============================================================================
-6. MAPPINGS                                                *claude-code-mappings*
+7. MAPPINGS                                                *claude-code-mappings*
 
 Default key mappings:
 
@@ -190,14 +226,14 @@ to re-enter insert mode so you can continue typing to Claude Code.
 You can customize these mappings in the configuration.
 
 ==============================================================================
-7. CONTRIBUTING                                          *claude-code-contributing*
+8. CONTRIBUTING                                          *claude-code-contributing*
 
 Contributions to Claude Code are welcome! If you would like to contribute,
 please check the CONTRIBUTING.md file in the repository for guidelines:
 https://github.com/greggh/claude-code.nvim/blob/main/CONTRIBUTING.md
 
 ==============================================================================
-8. LICENSE                                                  *claude-code-license*
+9. LICENSE                                                  *claude-code-license*
 
 MIT License
 
